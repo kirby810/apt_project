@@ -46,15 +46,15 @@ def plot_average_prices(df):
 
 
 def plot_average_prices_by_year(df):
-    years = df['연도'].unique()  # 데이터프레임에서 고유한 연도 추출
-    average_prices_by_year = {}  # 연도별 평균 분양가격을 저장할 딕셔너리 생성
+    years = df['연도'].unique()  
+    average_prices_by_year = {}  
 
-    # 연도별로 데이터를 분류하고 해당 연도의 평균 분양가격을 계산하여 딕셔너리에 저장
+    
     for year in years:
         year_df = df[df['연도'] == year]
         average_prices_by_year[year] = year_df['분양가격'].mean()
 
-    # 그래프 그리기
+    
     plt.figure(figsize=(10, 6))
     plt.plot(list(average_prices_by_year.keys()), list(average_prices_by_year.values()), marker='o', color='green', linestyle='-')
     plt.xlabel('연도')
@@ -65,10 +65,10 @@ def plot_average_prices_by_year(df):
 
 #지도
 def plot_map(df):
-    # 지역별 평균 분양가격 계산
+    # 지역별 평균 분양가격 
     average_prices = df.groupby('지역명')['분양가격'].mean().to_dict()
 
-    # 지역별 위도와 경도 정보
+    # 지역별 위도와 경도 
     locations = {
         '서울': [37.5665, 126.9780],
         '인천': [37.4563, 126.7052],
@@ -88,16 +88,12 @@ def plot_map(df):
         '경남': [35.4606, 128.2132],
         '제주': [33.4996, 126.5312]
     }
-
-    # Folium을 사용하여 지도 객체 생성
     m = folium.Map(location=[36.5, 127.5], zoom_start=7)
 
     # 각 지역에 마커 추가
     for region, location in locations.items():
-        # 해당 지역의 평균 분양가격을 가져옴
         avg_price = average_prices.get(region, '정보 없음')
-        # 마커에 지역 이름과 평균 분양가격 정보를 표시
-        popup_text = f"{region}: {avg_price:.2f}원/㎡"  # 소수점 둘째 자리까지 표시
+        popup_text = f"{region}: {avg_price:.2f}원/㎡" 
         folium.Marker(location=location, popup=popup_text).add_to(m)
 
     return m
