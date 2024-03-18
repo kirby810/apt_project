@@ -6,6 +6,8 @@ import folium
 from streamlit_folium import folium_static
 import matplotlib.font_manager as fm
 from streamlit_option_menu import option_menu
+import time
+
 plt.rcParams['font.family'] ='Malgun Gothic'
 
 
@@ -108,6 +110,12 @@ def plot_map(df):
 
     return m
 
+def stream_data(txt):
+    for word in txt.split(" "):
+        yield word + " "
+        time.sleep(0.02)
+
+
 
 
 #streamlit 페이지
@@ -115,20 +123,35 @@ def plot_map(df):
 with st.sidebar:
     selected = option_menu(
         menu_title="Menu",
-        options=["지역별 아파트 가격", "연도별 아파트 가격", "지도"],
-        icons=["house", "envelope", "map"],
-        menu_icon="kr",
+        options=["HOME", "지역별 아파트 가격", "연도별 아파트 가격", "지도"],
+        icons=["house", "envelope", "envelope","map"],
         default_index=0,
     )
     if selected in ["지역별 아파트 가격", "연도별 아파트 가격"]:
         graph_type = st.radio("그래프 종류", ["막대그래프", "선그래프"])
 
-st.title("한국 아파트 가격 현황")
 
-if selected == "지역별 아파트 가격":
+
+if selected == "HOME":
+    st.title("Project : apartment prices of SOUTH KOREA")
+    st.divider()
+
+    wr = (""" 
+          이번 프로젝트는 전국아파트 분양가격 데이터를 분석하고 시각화해서 아파트 시장 동향을 파악하는 것에 도움을 주는 것을 목적으로 하고 있습니다. 
+          
+          
+          - 지역별 아파트 가격: 지역별 아파트 가격의 분포를 막대그래프와 선그래프로 보여줍니다.
+          - 연도별 아파트 가격: 연도별 아파트 가격의 분포를 막대그래프와 선그래프로 보여줍니다.
+          - 지도: 지역별 아파트 가격의 분포를 지도에 마커로 표시해줍니다.
+        """)
+    st.write_stream(stream_data(wr))
+    st.image("apt_pic.jpg",use_column_width=True)
+elif selected == "지역별 아파트 가격":
+    st.title("지역별 아파트 가격")
     plt = plot_average_prices(df, graph_type)
     st.pyplot(plt)
 elif selected == "연도별 아파트 가격":
+    st.title("연도별 아파트 가격")
     plt = plot_average_prices_by_year(df, graph_type)
     st.pyplot(plt)
 elif selected == "지도":
