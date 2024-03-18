@@ -31,37 +31,47 @@ def filter_by_region(df, region):     #지역별로 분류해주는 함수
 
 
 
-def plot_average_prices(df):
+def plot_average_prices(df, graph_type):
     regions = ['서울', '인천', '경기', '부산', '대구', '광주', '대전', '울산', '세종', '강원', '충북', '충남', '전북', '전남', '경북', '경남', '제주']
     region_dfs = {region: filter_by_region(df, region) for region in regions}
     average_prices = {region: region_df['분양가격'].mean() for region, region_df in region_dfs.items()}
 
     plt.figure(figsize=(10, 6))
-    plt.bar(average_prices.keys(), average_prices.values(), color='red')
+    
+    if graph_type == "막대그래프":
+        plt.bar(average_prices.keys(), average_prices.values(), color='red')
+        plt.title('지역별 평균 분양가격')
+    elif graph_type == "선그래프":
+        plt.plot(average_prices.keys(), average_prices.values(), marker='o', color='blue', linestyle='-')
+        plt.title('지역별 평균 분양가격')
+    
     plt.xlabel('지역명')
     plt.ylabel('평균 분양가격(제곱미터)')
-    plt.title('지역별 평균 분양가격')
     plt.xticks(rotation=45)
     return plt
 
-
-def plot_average_prices_by_year(df):
+def plot_average_prices_by_year(df, graph_type):
     years = df['연도'].unique()  
     average_prices_by_year = {}  
 
-    
     for year in years:
         year_df = df[df['연도'] == year]
         average_prices_by_year[year] = year_df['분양가격'].mean()
 
-    
     plt.figure(figsize=(10, 6))
-    plt.plot(list(average_prices_by_year.keys()), list(average_prices_by_year.values()), marker='o', color='green', linestyle='-')
+    
+    if graph_type == "막대그래프":
+        plt.bar(list(average_prices_by_year.keys()), list(average_prices_by_year.values()), color='red')
+        plt.title('연도별 평균 분양가격')
+    elif graph_type == "선그래프":
+        plt.plot(list(average_prices_by_year.keys()), list(average_prices_by_year.values()), marker='o', color='blue', linestyle='-')
+        plt.title('연도별 평균 분양가격')
+    
     plt.xlabel('연도')
     plt.ylabel('평균 분양가격(제곱미터)')
-    plt.title('연도별 평균 분양가격')
     plt.xticks(rotation=45)
     return plt
+
 
 #지도
 def plot_map(df):
@@ -100,39 +110,30 @@ def plot_map(df):
 
 
 
-
-
-
-
-
-
-
-
 #streamlit 페이지
 
 with st.sidebar:
-  selected = option_menu(
-    menu_title = "Menu",
-    options = ["지역별 아파트 가격","연도별 아파트 가격","지도"],
-    icons = ["house","envelope","map"],
-    menu_icon = "kr",
-    default_index = 0,
+    selected = option_menu(
+        menu_title="Menu",
+        options=["지역별 아파트 가격", "연도별 아파트 가격", "지도"],
+        icons=["house", "envelope", "map"],
+        menu_icon="kr",
+        default_index=0,
+    )
+    if selected in ["지역별 아파트 가격", "연도별 아파트 가격"]:
+        graph_type = st.radio("그래프 종류", ["막대그래프", "선그래프"])
 
-  )
 st.title("한국 아파트 가격 현황")
 
 if selected == "지역별 아파트 가격":
-    plt = plot_average_prices(df)
+    plt = plot_average_prices(df, graph_type)
     st.pyplot(plt)
-if selected == "연도별 아파트 가격":
-    plt = plot_average_prices_by_year(df)
+elif selected == "연도별 아파트 가격":
+    plt = plot_average_prices_by_year(df, graph_type)
     st.pyplot(plt)
-if selected == "지도":
+elif selected == "지도":
     folium_map = plot_map(df)
     folium_static(folium_map)
-
-
-
 
 
 
