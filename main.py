@@ -157,14 +157,3 @@ elif selected == "연도별 아파트 가격":
 elif selected == "지도":
     folium_map = plot_map(df)
     folium_static(folium_map)
-
-
-
-
-
-
-
-
-
-
-
